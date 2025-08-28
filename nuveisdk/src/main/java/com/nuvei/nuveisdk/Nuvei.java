@@ -1,5 +1,7 @@
 package com.nuvei.nuveisdk;
 
+import android.util.Log;
+
 import com.nuvei.nuveisdk.model.ApiException;
 import com.nuvei.nuveisdk.model.ErrorResponseModel;
 import com.nuvei.nuveisdk.model.debit.DebitOrder;
@@ -47,6 +49,7 @@ public class Nuvei {
         Nuvei.serverCode = serverCode;
         Nuvei.serverKey = serverCode;
         Nuvei.testMode = testMode;
+        Log.v("iniciado", Nuvei.serverKey);
     }
 
     public static boolean isTestMode(){

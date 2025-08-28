@@ -12,6 +12,18 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.NuveiSDK">
         <activity
+            android:name=".listCard.ListCard"
+            android:exported="false" />
+        <activity
+            android:name=".home.HomeActivity"
+            android:exported="false" />
+        <activity
+            android:name=".Home"
+            android:exported="false" />
+        <activity
+            android:name=".activity_home"
+            android:exported="false" />
+        <activity
             android:name=".MainActivity"
             android:exported="true">
             <intent-filter>
