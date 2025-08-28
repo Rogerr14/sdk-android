@@ -1,5 +1,7 @@
 package com.nuvei.nuveisdk.model.addCard;
 
+import com.google.gson.annotations.SerializedName;
+
 public class ExtraParams {
     @SerializedName("threeDS2_data")
     private ThreeDS2Data threeDS2Data;
