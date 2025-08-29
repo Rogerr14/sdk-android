@@ -47,7 +47,7 @@ public class Nuvei {
         Nuvei.appCode = appCode;
         Nuvei.appKey = appKey;
         Nuvei.serverCode = serverCode;
-        Nuvei.serverKey = serverCode;
+        Nuvei.serverKey = serverKey;
         Nuvei.testMode = testMode;
         Log.v("iniciado", Nuvei.serverKey);
     }
@@ -92,11 +92,9 @@ public class Nuvei {
         }
     }
 
-    public static RefundResponse refund(String authToken, String transactionId, Long referenceLabel, Double amount, boolean moreInfo) throws IOException {
+    public static RefundResponse refund( TransactionRefund transactionRefund, OrderRefund orderRefund, boolean moreInfo) throws IOException {
         ApiService apiService = ApiClient.getClient(Nuvei.serverCode, Nuvei.serverKey).create(ApiService.class);
 
-        TransactionRefund transactionRefund = new TransactionRefund(transactionId, referenceLabel);
-        OrderRefund orderRefund = amount != null ? new OrderRefund(amount) : null;
 
         // Pass a Boolean object for `moreInfo` to allow nullability if needed, otherwise just a primitive.
         Boolean moreInfoObj = moreInfo;
@@ -116,18 +114,13 @@ public class Nuvei {
 
 
 
-    public static DebitResponse processDebit(String authToken, String userId, String userEmail,
-                                             Double amount, String description, String devReference,
-                                             Double vat, String cardToken) throws IOException {
+    public static DebitResponse processDebit(DebitRequest debitRequest) throws IOException {
 
         ApiService apiService = ApiClient.getClient(Nuvei.serverCode, Nuvei.serverKey).create(ApiService.class);
 
-        UserDebit user = new UserDebit(userId, userEmail);
-        DebitOrder order = new DebitOrder(amount, description, devReference, vat);
-        CardDelete card = new CardDelete(cardToken);
-        DebitRequest request = new DebitRequest(user, order, card);
 
-        Call<DebitResponse> call = apiService.debit(request);
+
+        Call<DebitResponse> call = apiService.debit(debitRequest);
         Response<DebitResponse> response = call.execute();
 
         if (response.isSuccessful() && response.body() != null) {

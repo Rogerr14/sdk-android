@@ -26,4 +26,60 @@ public class DebitTransactionResponse {
     private String paymentMethodType;
     @SerializedName("product_description")
     private String productDescription;
+
+    public String getStatus() {
+        return status;
+    }
+
+    public String getCurrentStatus() {
+        return currentStatus;
+    }
+
+    public String getPaymentDate() {
+        return paymentDate;
+    }
+
+    public Double getAmount() {
+        return amount;
+    }
+
+    public String getAuthorizationCode() {
+        return authorizationCode;
+    }
+
+    public int getInstallments() {
+        return installments;
+    }
+
+    public String getDevReference() {
+        return devReference;
+    }
+
+    public String getMessage() {
+        return message;
+    }
+
+    public String getCarrierCode() {
+        return carrierCode;
+    }
+
+    public String getId() {
+        return id;
+    }
+
+    public int getStatusDetail() {
+        return statusDetail;
+    }
+
+    public String getInstallmentsType() {
+        return installmentsType;
+    }
+
+    public String getPaymentMethodType() {
+        return paymentMethodType;
+    }
+
+    public String getProductDescription() {
+        return productDescription;
+    }
 }
