@@ -1,11 +1,14 @@
 package com.nuvei.nuveisdk.network;
 
 import com.nuvei.nuveisdk.model.addCard.AddCardRequest;
+import com.nuvei.nuveisdk.model.addCard.AddCardResponse;
 import com.nuvei.nuveisdk.model.debit.DebitRequest;
 import com.nuvei.nuveisdk.model.debit.DebitResponse;
 import com.nuvei.nuveisdk.model.deleteCard.DeleteCardRequest;
 import com.nuvei.nuveisdk.model.listCard.ListCardResponse;
 import com.nuvei.nuveisdk.model.listCard.MessageResponse;
+import com.nuvei.nuveisdk.model.otpResponse.OtpRequest;
+import com.nuvei.nuveisdk.model.otpResponse.OtpResponse;
 import com.nuvei.nuveisdk.model.refund.RefundRequest;
 import com.nuvei.nuveisdk.model.refund.RefundResponse;
 
@@ -36,6 +39,10 @@ public interface ApiService {
     Call<DebitResponse> debit(@Body DebitRequest request);
 
     @POST("/v2/card/add")
-    Call<String> addCard( @Body AddCardRequest request);
+    Call<AddCardResponse> addCard(@Body AddCardRequest request);
+
+    @POST("/v2/transaction/verify")
+    Call<OtpResponse> verify(@Body OtpRequest request);
+
 
 }

@@ -21,6 +21,7 @@ import com.nuvei.nuveisdk.model.listCard.CardItem;
 import com.nuvei.nuveisdk.model.listCard.ListCardResponse;
 import com.nuvei.nuveisdk.model.listCard.MessageResponse;
 import com.nuvei.sdk.R;
+import com.nuvei.sdk.addCard.AddCardActivity;
 import com.nuvei.sdk.listCard.adapter.CardAdapter;
 import com.nuvei.sdk.listCard.listener.OnCardActionListener;
 
@@ -46,6 +47,11 @@ public class ListCard extends AppCompatActivity implements OnCardActionListener 
         buttonReload.setOnClickListener(v-> {
             recyclerView.setAdapter(null);
             loadCards();
+        });
+        MaterialButton addCardButton = findViewById(R.id.add_card_button);
+        addCardButton.setOnClickListener(v->{
+            Intent intent = new Intent(ListCard.this, AddCardActivity.class);
+            startActivity(intent);
         });
         loadCards();
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {

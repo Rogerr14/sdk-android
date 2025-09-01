@@ -15,6 +15,9 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.NuveiSDK">
         <activity
+            android:name=".addCard.AddCardActivity"
+            android:exported="false" />
+        <activity
             android:name=".refund.RefundActivity"
             android:exported="false" />
         <activity

@@ -5,6 +5,11 @@ public class ErrorData {
     private String help;
     private String description;
 
+    public ErrorData(String type, String help, String description) {
+        this.type = type;
+        this.help = help;
+        this.description = description;
+    }
 
     public String getType() {
         return type;

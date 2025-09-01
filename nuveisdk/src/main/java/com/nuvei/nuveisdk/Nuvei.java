@@ -52,6 +52,21 @@ public class Nuvei {
         Log.v("iniciado", Nuvei.serverKey);
     }
 
+    public static String getAppCode(){
+        return Nuvei.appCode;
+    }
+    public static String getAppKey(){
+        return Nuvei.appKey;
+    }
+
+    public static String getServerCode(){
+        return Nuvei.serverCode;
+    }
+
+    public static String getServerKey(){
+        return Nuvei.serverKey;
+    }
+
     public static boolean isTestMode(){
         return  Nuvei.testMode;
     }
