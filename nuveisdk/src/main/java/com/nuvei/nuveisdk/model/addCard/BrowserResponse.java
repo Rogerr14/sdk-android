@@ -5,7 +5,7 @@ import com.google.gson.annotations.SerializedName;
 public class BrowserResponse {
     @SerializedName("challenge_request")
     private String challengeRequest;
-    @SerializedName("challenge_request")
+    @SerializedName("hidden_frame")
     private String hiddenIframe;
 
     public String getChallengeRequest() { return challengeRequest; }

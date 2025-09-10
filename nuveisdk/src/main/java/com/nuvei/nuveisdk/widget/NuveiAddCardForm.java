@@ -2,6 +2,8 @@ package com.nuvei.nuveisdk.widget;
 
 import android.content.Context;
 import android.os.AsyncTask;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -97,6 +99,49 @@ public class NuveiAddCardForm extends LinearLayout {
 
 
        addCardButton = findViewById(R.id.button_add_card);
+
+
+       addCardButton.setOnClickListener(view ->
+               {
+                   try {
+                       addCard();
+                   } catch (IOException e) {
+                       throw new RuntimeException(e);
+                   }
+               }
+       );
+
+       cardNumberEditText.addTextChangedListener(new TextWatcher() {
+           private String current = "";
+                                                     @Override
+                                                     public void afterTextChanged(Editable editable) {
+
+                                                     }
+
+                                                     @Override
+                                                     public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+                                                     }
+
+                                                     @Override
+                                                     public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+                                                         if(!charSequence.toString().equals(current)){
+                                                             cardNumberEditText.removeTextChangedListener(this);
+                                                             String raw = charSequence.toString().replaceAll("\\D", "");
+                                                             String formatted = CardHelper.formatCardNumber(raw);
+                                                             current = formatted;
+                                                             cardNumberEditText.setText(formatted);
+                                                             cardNumberEditText.setSelection(formatted.length());
+                                                             cardNumberEditText.addTextChangedListener(this);
+                                                         }
+
+
+
+
+                                                     }
+                                                 }
+       );
+
 //       addCardButton.setOnClickListener(v->{
 //           try {
 //               addCard();
@@ -135,26 +180,55 @@ public class NuveiAddCardForm extends LinearLayout {
         this.listener = listener;
     }
 
-//    private void addCard() throws IOException {
+  private void addCard() throws IOException {
+
+        String[] expiryDate = expiryDateEditText.getText().toString().split("/");
+        int expiryMonth = Integer.parseInt(expiryDate[0]);
+        int expiryYear = CardHelper.completeYear(Integer.parseInt(expiryDate[1]));
+       String cleanNumber = cardNumberEditText.getText().toString().replaceAll("\\D", "");
 //
-//        String[] expiryDate = expiryDateEditText.getText().toString().split("/");
-//        int expiryMonth = Integer.parseInt(expiryDate[0]);
-//        int expiryYear = CardHelper.completeYear(Integer.parseInt(expiryDate[1]));
-//        String cleanNumber = cardNumberEditText.getText().toString().replaceAll(" ", "");
-//
-//        ApiService apiService = ApiClient.getClient(Nuvei.getAppCode(), Nuvei.getAppKey()).create(ApiService.class);
-//        UserDebit user = new UserDebit("3", "correo@dd.com");
-//        CardModel card = new CardModel(cleanNumber, holderNameEditText.getText().toString(), expiryMonth, expiryYear, cvcCodeEditText.getText().toString(), "vi");
-//        ThreeDS2Data threeDS2Data = new ThreeDS2Data("https://lantechco.ec/img/callback3DS.php", "browser");
-//        BrowserInfo browserInfo = GlobalHelper.getBrowserInfo(context);
-//        ExtraParams extraParams = new ExtraParams(threeDS2Data, browserInfo);
-//        AddCardRequest addCardRequest = new AddCardRequest(user, card, extraParams);
-//        Call<AddCardResponse> call = apiService.addCard(addCardRequest);
-//        Response<AddCardResponse> response = call.execute();
-//        if(response.isSuccessful() && response.body() != null){
+        UserDebit user = new UserDebit("3", "correo@dd.com");
+      CardModel card = new CardModel(cleanNumber, holderNameEditText.getText().toString(), expiryMonth, expiryYear, cvcCodeEditText.getText().toString(), "vi");
+        ThreeDS2Data threeDS2Data = new ThreeDS2Data("https://lantechco.ec/img/callback3DS.php", "browser");
+        BrowserInfo browserInfo = GlobalHelper.getBrowserInfo(context);
+        ExtraParams extraParams = new ExtraParams(threeDS2Data, browserInfo);
+        AddCardRequest addCardRequest = new AddCardRequest(user, card, extraParams);
+
+      ApiService apiService = ApiClient.getClient(Nuvei.getAppCode(), Nuvei.getAppKey()).create(ApiService.class);
+      Call<AddCardResponse> call = apiService.addCard(addCardRequest);
+      call.enqueue(new retrofit2.Callback<AddCardResponse>() {
+          @Override
+          public void onResponse(Call<AddCardResponse> call, Response<AddCardResponse> response) {
+              // siempre vuelve al hilo donde post(...) se ejecute; para asegurarnos usamos post() sobre la vista:
+              post(() -> {
+                  if (listener != null) listener.onLoading(false);
+
+                  if (response.isSuccessful() && response.body() != null) {
+                      // usa tu handler para estados (valid/pending/rejected/etc)
+                     Log.v("response ok ", response.body().toString());
+                  } else {
+                      String errorBody = "";
+                      try {
+                          if (response.errorBody() != null) errorBody = response.errorBody().string();
+                      } catch (IOException e) { errorBody = e.getMessage(); }
+                      if (listener != null) listener.onError(new ErrorResponseModel(new ErrorData("api", "Error en el servidor", errorBody)));
+                  }
+              });
+          }
+
+          @Override
+          public void onFailure(Call<AddCardResponse> call, Throwable t) {
+              post(() -> {
+                  if (listener != null) {
+                      listener.onLoading(false);
+                      listener.onError(new ErrorResponseModel(new ErrorData("network", "Error de red", t.getMessage())));
+                  }
+              });
+          }
+      });
 //            handleAddCardResponse(response.body());
 //        }
-//    }
+}
 //
 //
 //    private void handleAddCardResponse(AddCardResponse response) {
@@ -223,46 +297,45 @@ public class NuveiAddCardForm extends LinearLayout {
 //    }
 //
 //
-//    private void handleVeifyOtp(OtpResponse response){
-//        switch (response.getTransactionOtpresponse().getStatus_detail()){
-//            case 31:
-//                otpCodeEditText.setText("");
-//                isOtpValid = true;
-//                break;
-//            case 32:
-//                isOtpActive = false;
-//                clearForm();
-//                listener.onSuccess(true);
-//                break;
-//            case 33:
-//                clearForm();
-//                listener.onSuccess(false);
-//                break;
-//            default:
-//                break;
-//        }
-//    }
-//
-//
-//    //validations
-//    private boolean validateAddCardForm() {
-//        // Implement your specific validation rules here
-//        return !cardNumberEditText.getText().toString().isEmpty() &&
-//                !holderNameEditText.getText().toString().isEmpty() &&
-//                !expiryDateEditText.getText().toString().isEmpty() &&
-//                !cvcCodeEditText.getText().toString().isEmpty();
-//    }
-//
-//    private void clearForm(){
-//        cardNumberEditText.setText("");
-//        holderNameEditText.setText("");
-//        expiryDateEditText.setText("");
-//        cvcCodeEditText.setText("");
-//        otpCodeEditText.setText("");
-//    }
-//
-//    private boolean validateOtpForm() {
-//        return otpCodeEditText.getText().toString().length() == 6;
-//    }
+    private void handleVeifyOtp(OtpResponse response){
+        switch (response.getTransactionOtpresponse().getStatus_detail()){
+            case 31:
+                otpCodeEditText.setText("");
+                isOtpValid = true;
+                break;
+            case 32:
+                isOtpActive = false;
+                clearForm();
+                listener.onSuccess(true);
+                break;
+            case 33:
+                clearForm();
+                listener.onSuccess(false);
+                break;
+            default:
+                break;
+        }
+    }
+
+    //validations
+    private boolean validateAddCardForm() {
+        // Implement your specific validation rules here
+        return !cardNumberEditText.getText().toString().isEmpty() &&
+                !holderNameEditText.getText().toString().isEmpty() &&
+                !expiryDateEditText.getText().toString().isEmpty() &&
+                !cvcCodeEditText.getText().toString().isEmpty();
+    }
+
+    private void clearForm(){
+        cardNumberEditText.setText("");
+        holderNameEditText.setText("");
+        expiryDateEditText.setText("");
+        cvcCodeEditText.setText("");
+        otpCodeEditText.setText("");
+    }
+
+    private boolean validateOtpForm() {
+        return otpCodeEditText.getText().toString().length() == 6;
+    }
 
 }

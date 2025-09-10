@@ -19,6 +19,7 @@
             android:layout_height="220dp"
 
             app:cardElevation="8dp"
+            android:background="@drawable/rounded_input_background"
             app:strokeColor="#DDDDDD"
             app:strokeWidth="1dp"
 
@@ -112,10 +113,10 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:hint="MM/YY"
-                app:hintEnabled="true"
+
+                app:hintEnabled="false"
                 app:errorEnabled="true"
-                style="@style/Widget.MaterialComponents.TextInputLayout.FilledBox"
+                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
                 app:boxCornerRadiusTopStart="12dp"
                 app:boxCornerRadiusTopEnd="12dp"
                 app:boxCornerRadiusBottomStart="12dp"
@@ -136,9 +137,9 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:layout_marginStart="16dp"
-                android:hint="CVV/CVVC"
-                app:errorEnabled="true"
-                style="@style/Widget.MaterialComponents.TextInputLayout.FilledBox"
+
+                app:hintEnabled="false"
+                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
                 app:boxCornerRadiusTopStart="12dp"
                 app:boxCornerRadiusTopEnd="12dp"
                 app:boxCornerRadiusBottomStart="12dp"
@@ -148,7 +149,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:inputType="numberPassword"
-                    android:hint="123"
+                    android:hint="CVV/CVVC"
                     android:background="@drawable/rounded_input_background"
                     android:maxLength="4"/>
             </com.google.android.material.textfield.TextInputLayout>

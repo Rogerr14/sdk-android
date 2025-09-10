@@ -4,11 +4,22 @@ import android.os.Build;
 import android.util.Base64;
 import android.util.Log;
 
+import com.nuvei.nuveisdk.model.addCard.CardInfoModel;
+import com.nuvei.nuveisdk.model.addCard.CardTypes;
+
 import java.time.LocalDate;
+import java.util.Arrays;
 import java.util.Date;
+
+
+
 
 public class CardHelper {
 
+    private static final int LENGTH_COMMON_CARD = 16;
+    private static final int LENGTH_AMERICAN_EXPRESS = 15;
+    private static final int LENGTH_DINERS_CLUB = 14;
+    private static String CARD_BRAND = null;
 
 
     /**
@@ -59,6 +70,54 @@ public class CardHelper {
     }
 
 
+
+    public static CardInfoModel getCardInfo(String number) {
+        // Limpiamos: quitamos todo lo que no sea dígito
+        String clean = number.replaceAll("\\D", "");
+
+        for (CardInfoModel info : CardTypes.ALL) {
+            if (info.getRegex().matcher(clean).find()) {
+                return info;
+            }
+        }
+
+        // Si no se encontró, devolvemos un "Unknown"
+        return new CardInfoModel(
+                "Unknown",
+                "^$",                              // regex vacío
+                "#### #### #### ####",
+                3,
+                java.util.Arrays.asList(16),
+                "",
+                "",
+                java.util.Arrays.asList("#cccccc", "#999999") // colores neutros
+        );
+    }
+
+
+    public static String formatCardNumber(String number) {
+        // 1. limpiar: solo dígitos
+        String clean = number.replaceAll("\\D", "");
+
+        // 2. obtener la máscara según el tipo de tarjeta
+        CardInfoModel def = getCardInfo(clean);
+        String mask = def.getMask();
+
+        // 3. construir resultado
+        StringBuilder result = new StringBuilder();
+        int i = 0;
+
+        for (char c : mask.toCharArray()) {
+            if (c == '#') {
+                if (i >= clean.length()) break; // si no hay más dígitos
+                result.append(clean.charAt(i++));
+            } else {
+                if (i < clean.length()) result.append(c);
+            }
+        }
+
+        return result.toString();
+    }
 //    static boolean validateExpiryDate(String expiryDate){
 //
 //   }
