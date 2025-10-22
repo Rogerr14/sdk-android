@@ -1,5 +1,7 @@
 package com.nuvei.nuveisdk.model.addCard;
 
+import android.graphics.drawable.Drawable;
+
 import java.util.List;
 import java.util.regex.Pattern;
 
@@ -10,8 +12,8 @@ public class CardInfoModel {
     private final int cvcNumber;            // Longitud del CVC
     private final List<Integer> validLengths; // Longitudes válidas del número
     private final String typeCode;          // Código: vi, mc, ax...
-    private final String icon;              // URL de icono
-    private final List<String> gradientColor; // Colores para gradiente
+    private final int iconRes;            // URL de icono
+    private final int[] gradientColor; // Colores para gradiente
 
     public CardInfoModel(String type,
                           String regex,
@@ -19,15 +21,15 @@ public class CardInfoModel {
                           int cvcNumber,
                           List<Integer> validLengths,
                           String typeCode,
-                          String icon,
-                          List<String> gradientColor) {
+                         int iconRes,
+                          int[] gradientColor) {
         this.type = type;
         this.regex = Pattern.compile(regex);
         this.mask = mask;
         this.cvcNumber = cvcNumber;
         this.validLengths = validLengths;
         this.typeCode = typeCode;
-        this.icon = icon;
+        this.iconRes = iconRes;
         this.gradientColor = gradientColor;
     }
 
@@ -38,6 +40,8 @@ public class CardInfoModel {
     public int getCvcNumber() { return cvcNumber; }
     public List<Integer> getValidLengths() { return validLengths; }
     public String getTypeCode() { return typeCode; }
-    public String getIcon() { return icon; }
-    public List<String> getGradientColor() { return gradientColor; }
+    public int getIconRes() {
+        return iconRes;
+    }
+    public int[] getGradientColor() { return gradientColor; }
 }

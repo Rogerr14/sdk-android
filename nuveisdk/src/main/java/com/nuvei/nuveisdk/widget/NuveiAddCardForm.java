@@ -1,21 +1,28 @@
 package com.nuvei.nuveisdk.widget;
 
 import android.content.Context;
+import android.graphics.drawable.GradientDrawable;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.text.Editable;
+import android.text.InputFilter;
 import android.text.TextWatcher;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.Nullable;
+import androidx.cardview.widget.CardView;
+import androidx.core.content.ContextCompat;
 
 import com.google.android.material.button.MaterialButton;
+import com.google.android.material.textfield.TextInputLayout;
 import com.nuvei.nuveisdk.Nuvei;
 import com.nuvei.nuveisdk.R;
 import com.nuvei.nuveisdk.helpers.CardHelper;
@@ -26,6 +33,7 @@ import com.nuvei.nuveisdk.model.addCard.AddCardFormListener;
 import com.nuvei.nuveisdk.model.addCard.AddCardRequest;
 import com.nuvei.nuveisdk.model.addCard.AddCardResponse;
 import com.nuvei.nuveisdk.model.addCard.BrowserInfo;
+import com.nuvei.nuveisdk.model.addCard.CardInfoModel;
 import com.nuvei.nuveisdk.model.addCard.CardModel;
 import com.nuvei.nuveisdk.model.addCard.CardResponse;
 import com.nuvei.nuveisdk.model.addCard.ExtraParams;
@@ -41,6 +49,7 @@ import com.nuvei.nuveisdk.network.ApiService;
 import java.io.IOException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.logging.Logger;
 
 import retrofit2.Call;
 import retrofit2.Response;
@@ -51,13 +60,25 @@ public class NuveiAddCardForm extends LinearLayout {
 
     private AddCardFormListener listener;
     private Context context;
-
+    private CardView cardView;
     private EditText cardNumberEditText;
     private EditText holderNameEditText;
     private EditText expiryDateEditText;
     private EditText cvcCodeEditText;
+
+
+    private TextInputLayout cardNumberInputLayout;
+    private TextInputLayout holderNameInputLayout;
+    private TextInputLayout expiryDateInputLayout;
+    private TextInputLayout cvcInputLayout;
+
+    private TextView numberCardTV;
+    private TextView nameHolderTV;
+    private TextView expiryDateTV;
+
     private EditText otpCodeEditText;
     private TextView otpCodeLabel;
+    private ImageView cardImage;
     private LinearLayout otpForm;
     private  MaterialButton addCardButton;
     private String transactionId = "";
@@ -93,8 +114,18 @@ public class NuveiAddCardForm extends LinearLayout {
          holderNameEditText= findViewById(R.id.holder_name_input);
          expiryDateEditText = findViewById(R.id.expiry_date_input);
          cvcCodeEditText= findViewById(R.id.cvv_input);
+         cardImage = findViewById(R.id.card_image);
+         cardView = findViewById(R.id.card_widget);
 
 
+        cardNumberInputLayout = findViewById(R.id.card_number_input_layout);
+        holderNameInputLayout = findViewById(R.id.holder_name_input_layout);
+        expiryDateInputLayout = findViewById(R.id.expiry_date_input_layout);
+        cvcInputLayout = findViewById(R.id.cvv_input_layout);
+
+         numberCardTV = findViewById(R.id.tv_card_number);
+         nameHolderTV = findViewById(R.id.tv_name_value);
+         expiryDateTV = findViewById(R.id.tv_date_value);
 
 
 
@@ -129,10 +160,24 @@ public class NuveiAddCardForm extends LinearLayout {
                                                              cardNumberEditText.removeTextChangedListener(this);
                                                              String raw = charSequence.toString().replaceAll("\\D", "");
                                                              String formatted = CardHelper.formatCardNumber(raw);
+                                                             CardInfoModel cardInfoModel = CardHelper.getCardInfo(raw);
+                                                             cardImage.setImageDrawable(ContextCompat.getDrawable(context, cardInfoModel.getIconRes()));
+                                                             cardView.setBackground(new GradientDrawable(GradientDrawable.Orientation.LEFT_RIGHT, cardInfoModel.getGradientColor()));
+
+                                                             InputFilter[] fArray = new InputFilter[1];
+                                                             fArray[0] = new InputFilter.LengthFilter(cardInfoModel.getCvcNumber());
+                                                             cvcCodeEditText.setFilters(fArray);
                                                              current = formatted;
+                                                             Log.v("format", formatted);
                                                              cardNumberEditText.setText(formatted);
                                                              cardNumberEditText.setSelection(formatted.length());
                                                              cardNumberEditText.addTextChangedListener(this);
+                                                             if(formatted.isEmpty()){
+                                                                 numberCardTV.setText("**** **** **** ****");
+                                                             }else{
+                                                                 numberCardTV.setText(formatted);
+                                                             }
+
                                                          }
 
 
@@ -141,6 +186,57 @@ public class NuveiAddCardForm extends LinearLayout {
                                                      }
                                                  }
        );
+
+        holderNameEditText.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void afterTextChanged(Editable editable) {
+
+            }
+
+            @Override
+            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+                holderNameEditText.removeTextChangedListener(this);
+                if(charSequence.toString().isEmpty()){
+                    nameHolderTV.setText("JHON DOE");
+                }else{
+                    nameHolderTV.setText(charSequence.toString());
+                }
+                holderNameEditText.addTextChangedListener(this);
+            }
+        });
+
+
+        expiryDateEditText.addTextChangedListener(new TextWatcher() {
+            private String previous = "";
+            @Override
+            public void afterTextChanged(Editable editable) {
+
+            }
+
+            @Override
+            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+                String formatted = CardHelper.formatExpiryInput(charSequence.toString());
+
+
+                    expiryDateEditText.removeTextChangedListener(this);
+                    expiryDateEditText.setText(formatted);
+                    expiryDateEditText.setSelection(formatted.length()); // Cursor al final
+                    expiryDateEditText.addTextChangedListener(this);
+
+                // Actualizar tarjeta o mostrar placeholder
+                expiryDateTV.setText(formatted.isEmpty() ? "MM/YY" : formatted);
+            }
+        });
 
 //       addCardButton.setOnClickListener(v->{
 //           try {
@@ -181,8 +277,47 @@ public class NuveiAddCardForm extends LinearLayout {
     }
 
   private void addCard() throws IOException {
+      cardNumberInputLayout.setError(null);
+      holderNameInputLayout.setError(null);
+      expiryDateInputLayout.setError(null);
+      cvcInputLayout.setError(null);
 
-        String[] expiryDate = expiryDateEditText.getText().toString().split("/");
+      String cardNumber = cardNumberEditText.getText().toString().replaceAll("\\D", "");
+      String expiry = expiryDateEditText.getText().toString();
+      String holderName = holderNameEditText.getText().toString().trim();
+      String cvc = cvcCodeEditText.getText().toString().trim();
+
+      boolean hasError = false;
+
+      // Validar número de tarjeta
+      if (cardNumber.isEmpty() || !CardHelper.validLuhnNumber(cardNumber)) {
+          cardNumberInputLayout.setError("Número de tarjeta inválido");
+          hasError = true;
+      }
+
+      // Validar nombre
+      if (holderName.isEmpty()) {
+          holderNameInputLayout.setError("Nombre del titular es requerido");
+          hasError = true;
+      }
+
+      // Validar fecha
+      String expiryError = CardHelper.validateExpiryDate(expiry);
+      if (expiryError != null) {
+          expiryDateInputLayout.setError(expiryError);
+          hasError = true;
+      }
+
+      // Validar CVC
+      if (cvc.isEmpty() || cvc.length() < 3) {
+          cvcInputLayout.setError("CVC inválido");
+          hasError = true;
+      }
+
+      if (hasError) return;
+
+
+      String[] expiryDate = expiryDateEditText.getText().toString().split("/");
         int expiryMonth = Integer.parseInt(expiryDate[0]);
         int expiryYear = CardHelper.completeYear(Integer.parseInt(expiryDate[1]));
        String cleanNumber = cardNumberEditText.getText().toString().replaceAll("\\D", "");

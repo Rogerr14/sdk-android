@@ -4,6 +4,9 @@ import android.os.Build;
 import android.util.Base64;
 import android.util.Log;
 
+import androidx.core.content.ContextCompat;
+
+import com.nuvei.nuveisdk.R;
 import com.nuvei.nuveisdk.model.addCard.CardInfoModel;
 import com.nuvei.nuveisdk.model.addCard.CardTypes;
 
@@ -16,10 +19,7 @@ import java.util.Date;
 
 public class CardHelper {
 
-    private static final int LENGTH_COMMON_CARD = 16;
-    private static final int LENGTH_AMERICAN_EXPRESS = 15;
-    private static final int LENGTH_DINERS_CLUB = 14;
-    private static String CARD_BRAND = null;
+
 
 
     /**
@@ -28,7 +28,7 @@ public class CardHelper {
      * @param cardNumber a String that may or may not represent a valid Luhn number
      * @return {@code true} if and only if the input value is a valid Luhn number
      */
-    static boolean validLuhnNumber(String cardNumber){
+    public static boolean validLuhnNumber(String cardNumber){
         boolean isOdd= true;
         int sum = 0;
 
@@ -51,6 +51,41 @@ public class CardHelper {
             sum += digitInteger;
         }
         return sum%10 == 0;
+    }
+
+
+    public static String validateExpiryDate(String expiry) {
+        if (expiry == null || expiry.trim().length() != 5) {
+            return "Expiry date is not valid";
+        }
+
+        String[] parts = expiry.split("/");
+        if (parts.length != 2) {
+            return "Expiry date is not valid";
+        }
+
+        int month, year;
+        try {
+            month = Integer.parseInt(parts[0]);
+            year = Integer.parseInt(parts[1]);
+        } catch (NumberFormatException e) {
+            return "Expiry date is not valid";
+        }
+
+        if (month < 1 || month > 12) {
+            return "Expiry date is not valid";
+        }
+
+        // Fecha actual
+        java.util.Calendar now = java.util.Calendar.getInstance();
+        int currentYear = now.get(java.util.Calendar.YEAR) % 100; // últimos 2 dígitos
+        int currentMonth = now.get(java.util.Calendar.MONTH) + 1;  // Calendar.MONTH es 0-index
+
+        if (year < currentYear || (year == currentYear && month < currentMonth)) {
+            return "Expiry date is not valid";
+        }
+
+        return null; // válido
     }
 
 
@@ -89,8 +124,8 @@ public class CardHelper {
                 3,
                 java.util.Arrays.asList(16),
                 "",
-                "",
-                java.util.Arrays.asList("#cccccc", "#999999") // colores neutros
+                R.drawable.ic_unknown,
+                new int[]{0xFF333333, 0xFF000000} // colores neutros
         );
     }
 
@@ -121,5 +156,57 @@ public class CardHelper {
 //    static boolean validateExpiryDate(String expiryDate){
 //
 //   }
+
+
+    public static String formatExpiryInput(String value) {
+        if (value == null) return "";
+
+        // Solo mantener dígitos
+        String digits = value.replaceAll("\\D", "");
+
+        // Cortar a máximo 4 dígitos (MMYY)
+        if (digits.length() > 4) {
+            digits = digits.substring(0, 4);
+        }
+
+        if (digits.isEmpty()) {
+            return "";
+        }
+
+        String month;
+        String year = "";
+
+        if (digits.length() >= 2) {
+            month = digits.substring(0, 2);
+            year = digits.substring(2);
+        } else {
+            month = digits;
+        }
+
+        // Si se ingresa un solo dígito mayor a '1', lo convertimos a "0X"
+        if (month.length() == 1 && Character.getNumericValue(month.charAt(0)) > 1) {
+            month = "0" + month;
+            digits = month + (digits.length() > 1 ? digits.substring(1) : "");
+            year = digits.length() > 2 ? digits.substring(2) : "";
+        }
+
+        // Si ya hay 2 dígitos y el mes no es válido, lo corregimos a "01"
+        if (month.length() == 2) {
+            int monthNum = Integer.parseInt(month);
+            if (monthNum < 1 || monthNum > 12) {
+                // Corregimos automáticamente
+                month = "01";
+            }
+        }
+
+        // Construir salida con "/"
+        if (!year.isEmpty()) {
+            return month + "/" + year;
+        }
+        else {
+            return month;
+        }
+    }
+
 
 }

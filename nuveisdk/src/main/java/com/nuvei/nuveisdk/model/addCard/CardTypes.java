@@ -1,5 +1,9 @@
 package com.nuvei.nuveisdk.model.addCard;
 
+import androidx.core.content.ContextCompat;
+
+import com.nuvei.nuveisdk.R;
+
 import java.util.Arrays;
 import java.util.List;
 
@@ -12,8 +16,8 @@ public class CardTypes {
                     3,
                     Arrays.asList(13, 16, 19),
                     "vi",
-                    "https://github.com/paymentez/paymentez-ios/blob/master/PaymentSDK/PaymentAssets.xcassets/stp_card_visa.imageset/stp_card_visa@3x.png?raw=true",
-                    Arrays.asList("#1a1f71", "#3d5bf6")
+                    R.drawable.ic_visa,
+                    new int[]{0xFF1a1f71, 0xFF3d5bf6}
             ),
             new CardInfoModel(
                     "Mastercard",
@@ -22,8 +26,9 @@ public class CardTypes {
                     3,
                     Arrays.asList(16),
                     "mc",
-                    "https://github.com/paymentez/paymentez-ios/blob/master/PaymentSDK/PaymentAssets.xcassets/stp_card_mastercard.imageset/stp_card_mastercard@3x.png?raw=true",
-                    Arrays.asList("#eb001b", "#f79e1b")
+                    R.drawable.ic_mastercard,
+
+                    new int[]{0xFFeb001b, 0xFFf79e1b}
             ),
             new CardInfoModel(
                     "American Express",
@@ -32,8 +37,8 @@ public class CardTypes {
                     4,
                     Arrays.asList(15),
                     "ax",
-                    "https://github.com/paymentez/paymentez-ios/blob/master/PaymentSDK/PaymentAssets.xcassets/stp_card_amex.imageset/stp_card_amex@3x.png?raw=true",
-                    Arrays.asList("#2e77bb", "#1e5799")
+                    R.drawable.ic_amex,
+                    new int[]{0xFF2e77bb, 0xFF1e5799}
             ),
             new CardInfoModel(
                     "Diners",
@@ -42,8 +47,8 @@ public class CardTypes {
                     3,
                     Arrays.asList(14),
                     "di",
-                    "https://github.com/paymentez/paymentez-ios/blob/master/PaymentSDK/PaymentAssets.xcassets/stp_card_diners.imageset/stp_card_diners@3x.png?raw=true",
-                    Arrays.asList("#006ba1", "#00b5e2")
+                    R.drawable.ic_diners,
+                    new int[]{0xFF006ba1, 0xFF00b5e2}
             )
     );
 

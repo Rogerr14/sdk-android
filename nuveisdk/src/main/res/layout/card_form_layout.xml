@@ -26,19 +26,82 @@
             android:layout_marginBottom="24dp">
 
             <androidx.cardview.widget.CardView
+                android:id="@+id/card_widget"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:backgroundTint="@color/black"
+                android:background="@color/black"
+                app:cardBackgroundColor="@color/black"
                 app:cardCornerRadius="20dp"
 
                 >
-                <ImageView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:src="@drawable/ic_unknown"
+                <androidx.constraintlayout.widget.ConstraintLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:padding="16dp">
+                    <ImageView
+                        android:id="@+id/card_image"
+                        android:layout_width="40dp"
+                        android:layout_height="40dp"
+                        android:src="@drawable/ic_unknown"
+                        android:contentDescription="Card placeholder image"
+                        app:layout_constraintTop_toTopOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"/>
+                    <TextView
+                        android:id="@+id/tv_card_number"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="**** ***** **** ****"
+                        android:textColor="@android:color/white"
+                        android:textSize="22sp"
+                        android:textStyle="normal"
+                        app:layout_constraintTop_toTopOf="parent"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintEnd_toEndOf="parent"/>
+                    <TextView
+                        android:id="@+id/tv_name_title"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Name Holder"
+                        android:textColor="@android:color/darker_gray"
+                        android:textSize="12sp"
+                        app:layout_constraintBottom_toTopOf="@id/tv_name_value"
+                        app:layout_constraintStart_toStartOf="parent"/>
 
-                    android:layout_margin="20dp"
-                    android:contentDescription="Card placeholder image"/>
+                    <TextView
+                        android:id="@+id/tv_name_value"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="John Doe"
+                        android:textColor="@android:color/white"
+                        android:textSize="14sp"
+                        android:textStyle="bold"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"/>
+
+                    <TextView
+                        android:id="@+id/tv_date_title"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Date Expiry"
+                        android:textColor="@android:color/darker_gray"
+                        android:textSize="12sp"
+                        app:layout_constraintBottom_toTopOf="@id/tv_date_value"
+                        app:layout_constraintEnd_toEndOf="parent"/>
+
+                    <TextView
+                        android:id="@+id/tv_date_value"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="23/27"
+                        android:textColor="@android:color/white"
+                        android:textSize="14sp"
+                        android:textStyle="bold"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintEnd_toEndOf="parent"/>
+
+                </androidx.constraintlayout.widget.ConstraintLayout>
+
             </androidx.cardview.widget.CardView>
 
         </com.google.android.material.card.MaterialCardView>
@@ -97,6 +160,7 @@
                 android:id="@+id/holder_name_input"
                 android:layout_width="match_parent"
                 android:hint="JHON DOE"
+                android:maxLength="20"
                 android:background="@drawable/rounded_input_background"
                 android:layout_height="wrap_content"
                 android:inputType="textCapCharacters"/>
@@ -113,7 +177,6 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-
                 app:hintEnabled="false"
                 app:errorEnabled="true"
                 style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
@@ -127,7 +190,7 @@
                     android:layout_height="wrap_content"
                     android:hint="MM/YY"
                     android:background="@drawable/rounded_input_background"
-                    android:inputType="date"
+                    android:inputType="numberSigned"
                     android:maxLength="5"/>
             </com.google.android.material.textfield.TextInputLayout>
 
