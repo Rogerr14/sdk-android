@@ -1,5 +1,8 @@
 package com.nuvei.nuveisdk.widget;
 
+import android.animation.Animator;
+import android.animation.AnimatorListenerAdapter;
+import android.animation.ObjectAnimator;
 import android.content.Context;
 import android.graphics.drawable.GradientDrawable;
 import android.os.AsyncTask;
@@ -60,7 +63,9 @@ public class NuveiAddCardForm extends LinearLayout {
 
     private AddCardFormListener listener;
     private Context context;
-    private CardView cardView;
+
+    private CardView cardFront;
+    private CardView cardBack;
     private EditText cardNumberEditText;
     private EditText holderNameEditText;
     private EditText expiryDateEditText;
@@ -75,6 +80,7 @@ public class NuveiAddCardForm extends LinearLayout {
     private TextView numberCardTV;
     private TextView nameHolderTV;
     private TextView expiryDateTV;
+    private TextView cvcValueTV;
 
     private EditText otpCodeEditText;
     private TextView otpCodeLabel;
@@ -84,6 +90,7 @@ public class NuveiAddCardForm extends LinearLayout {
     private String transactionId = "";
     private boolean isOtpActive = false;
     private boolean isOtpValid = true;
+    private boolean isFrontShowing = true;
     private final ExecutorService executorService = Executors.newSingleThreadExecutor();
 
 
@@ -110,12 +117,20 @@ public class NuveiAddCardForm extends LinearLayout {
 
     public void init(){
         LayoutInflater.from(context).inflate(R.layout.card_form_layout, this, true);
+
+        cardFront = findViewById(R.id.card_front);
+        cardBack = findViewById(R.id.card_back);
          cardNumberEditText= findViewById(R.id.card_number_input);
          holderNameEditText= findViewById(R.id.holder_name_input);
          expiryDateEditText = findViewById(R.id.expiry_date_input);
          cvcCodeEditText= findViewById(R.id.cvv_input);
          cardImage = findViewById(R.id.card_image);
-         cardView = findViewById(R.id.card_widget);
+        cardBack.setRotationY(180f);
+
+        // Mejorar perspectiva para el efecto 3D
+        float scale = context.getResources().getDisplayMetrics().density;
+        cardFront.setCameraDistance(8000 * scale);
+        cardBack.setCameraDistance(8000 * scale);
 
 
         cardNumberInputLayout = findViewById(R.id.card_number_input_layout);
@@ -126,6 +141,7 @@ public class NuveiAddCardForm extends LinearLayout {
          numberCardTV = findViewById(R.id.tv_card_number);
          nameHolderTV = findViewById(R.id.tv_name_value);
          expiryDateTV = findViewById(R.id.tv_date_value);
+        cvcValueTV = findViewById(R.id.tv_cvc_value);
 
 
 
@@ -141,6 +157,31 @@ public class NuveiAddCardForm extends LinearLayout {
                    }
                }
        );
+
+        cvcCodeEditText.setOnFocusChangeListener(new OnFocusChangeListener() {
+            @Override
+            public void onFocusChange(View v, boolean hasFocus) {
+                if (hasFocus && isFrontShowing) {
+                    flipCard(true); // Girar al reverso
+                } else if (!hasFocus && !isFrontShowing) {
+                    flipCard(false); // Girar al frente
+                }
+            }
+        });
+
+        cvcCodeEditText.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {}
+
+            @Override
+            public void afterTextChanged(Editable s) {
+                String cvc = s.toString().trim();
+                cvcValueTV.setText(cvc.isEmpty() ? "***" : cvc);
+            }
+        });
 
        cardNumberEditText.addTextChangedListener(new TextWatcher() {
            private String current = "";
@@ -162,8 +203,8 @@ public class NuveiAddCardForm extends LinearLayout {
                                                              String formatted = CardHelper.formatCardNumber(raw);
                                                              CardInfoModel cardInfoModel = CardHelper.getCardInfo(raw);
                                                              cardImage.setImageDrawable(ContextCompat.getDrawable(context, cardInfoModel.getIconRes()));
-                                                             cardView.setBackground(new GradientDrawable(GradientDrawable.Orientation.LEFT_RIGHT, cardInfoModel.getGradientColor()));
-
+                                                             cardFront.setBackground(new GradientDrawable(GradientDrawable.Orientation.LEFT_RIGHT, cardInfoModel.getGradientColor()));
+                                                             cardBack.setBackground(new GradientDrawable(GradientDrawable.Orientation.LEFT_RIGHT, cardInfoModel.getGradientColor()));
                                                              InputFilter[] fArray = new InputFilter[1];
                                                              fArray[0] = new InputFilter.LengthFilter(cardInfoModel.getCvcNumber());
                                                              cvcCodeEditText.setFilters(fArray);
@@ -237,6 +278,7 @@ public class NuveiAddCardForm extends LinearLayout {
                 expiryDateTV.setText(formatted.isEmpty() ? "MM/YY" : formatted);
             }
         });
+
 
 //       addCardButton.setOnClickListener(v->{
 //           try {
@@ -432,6 +474,34 @@ public class NuveiAddCardForm extends LinearLayout {
 //    }
 //
 //
+
+private void flipCard(boolean toBack) {
+    final View showingView = toBack ? cardFront : cardBack;
+    final View hiddenView = toBack ? cardBack : cardFront;
+
+    ObjectAnimator animator = ObjectAnimator.ofFloat(showingView, "rotationY", 0f, 180f);
+    animator.setDuration(500);
+
+    animator.addListener(new AnimatorListenerAdapter() {
+        @Override
+        public void onAnimationStart(Animator animation) {
+            hiddenView.setVisibility(View.VISIBLE);
+        }
+
+        @Override
+        public void onAnimationEnd(Animator animation) {
+            showingView.setVisibility(View.GONE);
+            isFrontShowing = !toBack;
+        }
+    });
+
+    ObjectAnimator counterAnimator = ObjectAnimator.ofFloat(hiddenView, "rotationY",
+            toBack ? 180f : -180f, 0f);
+    counterAnimator.setDuration(500);
+
+    animator.start();
+    counterAnimator.start();
+}
     private void handleVeifyOtp(OtpResponse response){
         switch (response.getTransactionOtpresponse().getStatus_detail()){
             case 31:

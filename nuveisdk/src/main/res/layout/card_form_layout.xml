@@ -24,9 +24,12 @@
             app:strokeWidth="1dp"
 
             android:layout_marginBottom="24dp">
-
+            <FrameLayout
+                android:id="@+id/fl_card_container"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
             <androidx.cardview.widget.CardView
-                android:id="@+id/card_widget"
+                android:id="@+id/card_front"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:background="@color/black"
@@ -103,7 +106,56 @@
                 </androidx.constraintlayout.widget.ConstraintLayout>
 
             </androidx.cardview.widget.CardView>
+                <androidx.cardview.widget.CardView
+                    android:id="@+id/card_back"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:background="@color/black"
+                    app:cardBackgroundColor="@color/black"
+                    app:cardCornerRadius="20dp"
+                    android:visibility="gone">
 
+                    <androidx.constraintlayout.widget.ConstraintLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:padding="16dp">
+
+                        <!-- Banda magnética -->
+                        <View
+                            android:id="@+id/magnetic_strip"
+                            android:layout_width="match_parent"
+                            android:layout_height="40dp"
+                            android:background="@android:color/darker_gray"
+                            app:layout_constraintTop_toTopOf="parent"
+                            app:layout_constraintStart_toStartOf="parent"
+                            app:layout_constraintEnd_toEndOf="parent"/>
+
+                        <!-- Título y valor del CVC -->
+                        <TextView
+                            android:id="@+id/tv_cvc_title"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="CVC"
+                            android:textColor="@android:color/darker_gray"
+                            android:textSize="12sp"
+                            app:layout_constraintTop_toBottomOf="@id/magnetic_strip"
+                            app:layout_constraintEnd_toEndOf="parent"
+                            android:layout_marginTop="16dp"/>
+
+                        <TextView
+                            android:id="@+id/tv_cvc_value"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="***"
+                            android:textColor="@android:color/white"
+                            android:textSize="14sp"
+                            android:textStyle="bold"
+                            app:layout_constraintTop_toBottomOf="@id/tv_cvc_title"
+                            app:layout_constraintEnd_toEndOf="parent"/>
+
+                    </androidx.constraintlayout.widget.ConstraintLayout>
+                </androidx.cardview.widget.CardView>
+            </FrameLayout>
         </com.google.android.material.card.MaterialCardView>
 
 
@@ -172,6 +224,7 @@
             android:orientation="horizontal"
             android:layout_marginBottom="8dp">
 
+
             <com.google.android.material.textfield.TextInputLayout
                 android:id="@+id/expiry_date_input_layout"
                 android:layout_width="0dp"
@@ -179,11 +232,13 @@
                 android:layout_weight="1"
                 app:hintEnabled="false"
                 app:errorEnabled="true"
+                android:hint=""
                 style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
                 app:boxCornerRadiusTopStart="12dp"
                 app:boxCornerRadiusTopEnd="12dp"
                 app:boxCornerRadiusBottomStart="12dp"
                 app:boxCornerRadiusBottomEnd="12dp">
+
                 <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/expiry_date_input"
                     android:layout_width="match_parent"
@@ -218,6 +273,17 @@
             </com.google.android.material.textfield.TextInputLayout>
         </LinearLayout>
 
+        <LinearLayout
+            android:id="@+id/otp_form"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:visibility="gone">
+            <EditText
+                android:id="@+id/otp_code_input"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="Código OTP"/>
+        </LinearLayout>
         <!-- button add Card -->
         <com.google.android.material.button.MaterialButton
             android:layout_width="match_parent"
