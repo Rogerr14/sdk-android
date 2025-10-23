@@ -9,5 +9,4 @@ public class Constants {
     public static String APPKEY = "NXaK6ukvqwaPshOtFfJAhN9dkPnloR";
     public static String SERVERCODE = "MODIRUMTEST-EC";
     public static String SERVERKEY = "NXaK6ukvqwaPshOtFfJAhN9dkPnloR";
-
 }

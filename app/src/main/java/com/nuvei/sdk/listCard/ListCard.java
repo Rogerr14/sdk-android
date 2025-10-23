@@ -71,7 +71,7 @@ public class ListCard extends AppCompatActivity implements OnCardActionListener 
 
     @Override
     public void onDeleteCard(String cardToken) {
-        showLoading(true);
+        runOnUiThread(()-> showLoading(true));
         executorService.execute(() -> {
             try {
                 MessageResponse message = Nuvei.deleteCard("4", cardToken);
@@ -85,8 +85,10 @@ public class ListCard extends AppCompatActivity implements OnCardActionListener 
                     }
                 });
             } catch (Exception e) {
-                showLoading(false);
+
+
                 runOnUiThread(() -> {
+                    showLoading(false);
                     Toast.makeText(ListCard.this, "Exception: " + e.getMessage(), Toast.LENGTH_SHORT).show();
                 });
                 e.printStackTrace();
